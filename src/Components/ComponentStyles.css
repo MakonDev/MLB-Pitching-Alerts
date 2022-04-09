@@ -1,0 +1,22 @@
+.container {
+  padding: 10px 10px 10px 10px;
+}
+
+.gameNotBeingPlayed {
+  background-color: lightblue;
+  border-bottom: 5px;
+  border-radius: 5px;
+}
+
+.gameNoAction {
+  background-color: lightpink;
+}
+
+.gamePotentialAction {
+  background-color: lightyellow;
+}
+
+.gameActionWatch {
+  background-color: lightgreen;
+  color: purple
+}

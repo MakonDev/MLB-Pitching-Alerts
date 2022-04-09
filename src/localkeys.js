@@ -1,0 +1,3 @@
+export const twitterApiKey = 'XhJzQvERXdPOICyEhDc3uB7VL'
+export const twitterApiSecret = 'WdMMGWR4loc0QrU7BzY90IKW7gYw0AUEJOCLsRpgwSK9igDJ9r'
+export const twitterBearerToken = 'AAAAAAAAAAAAAAAAAAAAAN8qbQEAAAAAniWrRkb66Wlxi%2B66asEhsQQIzfc%3DvvnZD1WUliQZnEkird3OWssAVEZm06HotcxQpDD33WJWsGvsLr'
