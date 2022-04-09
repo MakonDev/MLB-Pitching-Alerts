@@ -10,7 +10,7 @@ const GameTiles = () => {
   const [date, setDate] = useState("04-08-2022")
 
   useEffect(() => {
-    // const intervalId = setInterval(() => {
+    const intervalId = setInterval(() => {
       const fetchGamesInfo = async () => {
         const gameData = await axios.get(GAME_DATA_URL);
         const gameDataLoad = gameData.data.dates.at(-1)
@@ -21,8 +21,8 @@ const GameTiles = () => {
       fetchGamesInfo().catch(() => {
         console.log("Error fetching games")
       })
-    // },1000000);
-    // return () => clearInterval(intervalId);
+    },15000);
+    return () => clearInterval(intervalId);
   },[])
 
   useEffect(() => {

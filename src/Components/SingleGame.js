@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { getLiveGameData } from "../Requests/GameData";
+import { getLiveGameData, getPitchCountLevels, getWarningLevels } from "../Requests/GameData";
 import { Grid, Card, CardContent, Collapse, CardActions } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -24,9 +24,7 @@ const SingleGame = (singleGame) => {
   const homeTeamName = (game && game.teams && game.teams.home) ? game.teams.home.team.name : 'Home'
   const awayTeamName = (game && game.teams && game.teams.away) ? game.teams.away.team.name : 'Away'
   const gameStatus = (game && game.status) ? game.status.detailedState : 'Pending'
-  const gameOver = (game && game.status) ? (gameStatus === 'Final' || gameStatus === 'Pending' || gameStatus === 'Postponed') 
-    ? true : false 
-      : true
+  const gameLive = (game && game.status && gameStatus === 'In Progress') ? true : false
   const homeScore = (game && game.teams && game.teams.home) ? game.teams.home.score : -1
   const awayScore = (game && game.teams && game.teams.away) ? game.teams.away.score : -1
   const homeWin = (game && game.teams && game.teams.home) ? game.teams.home.isWinner : null
@@ -37,15 +35,40 @@ const SingleGame = (singleGame) => {
     : true
   );
   const [gameInfoLive, setGameInfoLive] = useState({})
-  const [notificationSetting, setNotificationSetting] = useState("gameNotBeingPlayed")
   const currentBatter = (gameInfoLive && gameInfoLive.liveData && gameInfoLive.liveData.linescore && gameInfoLive.liveData.linescore.offense
     && gameInfoLive.liveData.linescore.offense.batter) ? gameInfoLive.liveData.linescore.offense.batter.fullName : ''
   const linescore = (gameInfoLive && gameInfoLive.liveData) ? gameInfoLive.liveData.linescore : {}
-  const currentPitcher = (linescore && linescore.defense && linescore.pitcher) ? linescore.defense.pitcher.fullName : 'Not yet'
+  const currentPitcher = (linescore && linescore.defense && linescore.defense.pitcher) ? linescore.defense.pitcher.fullName : 'Not yet'
   const probableHomePitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.home) ? gameInfoLive.gameData.probablePitchers.home.fullName : 'No Probable Home Pitcher'
   const probableAwayPitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.away) ? gameInfoLive.gameData.probablePitchers.away.fullName : 'No Probable Away Pitcher'
 
-  console.log(linescore)
+  const getTotalPitches = (pitcher) => {
+    if (gameInfoLive && gameInfoLive.liveData && pitcher) {
+      let pitches =[]
+      for (var x = 0; x < gameInfoLive.liveData.boxscore.info.length; x++) {
+        const info = gameInfoLive.liveData.boxscore.info[x]
+        if (info.label === 'Pitches-strikes') {
+          const lastName = pitcher.split(" ").at(-1)
+          const pitchersSplits = info.value.split(";")
+          for (var i = 0; i < pitchersSplits.length; i++) {
+            if (pitchersSplits[i].includes(lastName)) {
+              let split = pitchersSplits[i].replace(".","")
+              const values = split.split(" ")
+              
+              pitches = values.at(-1).split("-")
+              break;
+            }
+          }
+          break;
+        }
+      }
+      return pitches
+    }
+  }
+
+  const pitches = getTotalPitches(currentPitcher ? currentPitcher : null)
+  const pitchCountLevel = getPitchCountLevels(pitches ? pitches[0] : null)
+  const warningLevel = getWarningLevels(pitchCountLevel ? pitchCountLevel : null)
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -54,10 +77,8 @@ const SingleGame = (singleGame) => {
   useEffect(() => {
     if (game && game.gamePk) {
       const fetchGameInfo = async () => {
-        console.log(game.gamePk)
         const LIVE_GAME_URL = getLiveGameData(game.gamePk)
         const gameData = await axios.get(LIVE_GAME_URL);
-        console.log(gameData.data)
         setGameInfoLive(gameData.data)
         
       }
@@ -68,12 +89,10 @@ const SingleGame = (singleGame) => {
     }
   },[game, game.gamePk])
 
-
-
   return (
     <Grid item xs={6} >
       <Card variant="outlined">
-      <CardContent className={notificationSetting}>
+      <CardContent className={"gameNotBeingPlayed"}>
         {(homeScore && awayScore) ?
         <h2>
           {homeTeamName}: {homeScore} {homeWin && <span>(W)</span>} vs. {awayTeamName}: {awayScore} {awayWin && <span>(W)</span>}
@@ -82,7 +101,7 @@ const SingleGame = (singleGame) => {
           {homeTeamName} {homeWin && <span>(W)</span>} vs. {awayTeamName} {awayWin && <span>(W)</span>}
         </h2>
         }
-        {gameOver 
+        {gameLive 
           ? <h3>Situation: {linescore.inningHalf} {linescore.currentInning}, {linescore.balls}-{linescore.strikes} Count {linescore.outs} Outs, {currentBatter} hitting.</h3> 
           : <h3>Status: {gameStatus}</h3>
         }
@@ -100,13 +119,26 @@ const SingleGame = (singleGame) => {
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-        {gameStatus === 'Live' 
+        {gameStatus === 'In Progress' 
           ? 
             <>
               <h2>Current Pitcher: {currentPitcher}</h2>
+              {(pitches && pitches.length !== 0) &&
+                <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]}</h3>
+              }
 
             </>
           : <h2>Matchup: {probableHomePitcher} vs {probableAwayPitcher}</h2>
+        }
+        </CardContent>
+        <CardContent>
+        {gameStatus === 'In Progress' 
+          ? 
+          <>
+            <h2>Alerts</h2>
+            <h3 className={warningLevel}>Pitch Count: {pitchCountLevel}</h3>
+          </>
+          : <h3>No Alerts Available</h3>
         }
         </CardContent>
       </Collapse>

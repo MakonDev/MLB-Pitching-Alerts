@@ -20,3 +20,15 @@
   background-color: lightgreen;
   color: purple
 }
+
+.lowAlert {
+  background-color: lightyellow;
+}
+
+.watchAlert {
+  background-color: orange;
+}
+
+.highAlert {
+  background-color: red;
+}
