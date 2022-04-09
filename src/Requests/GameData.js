@@ -32,10 +32,13 @@ export const getWarningLevels = (level) => {
     if (level === 'Watch') {
       return 'watchAlert'
     }
-    else {
+    if (level === 'Low') {
       return 'lowAlert'
     }
+    else {
+      return 'noAlert'
+    }
   } else {
-    return 'lowAlert'
+    return 'noAlert'
   }
 }
