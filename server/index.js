@@ -6,9 +6,6 @@ const app = express();
 //app.use(express.static(path.join(__dirname, 'build')));
 
 app.get("/api", (req, res) => {
-  const one  = gameSchedule();
-  console.log(one)
-
   res.json({ message: "Hello from Express!", data: one });
 });
 
