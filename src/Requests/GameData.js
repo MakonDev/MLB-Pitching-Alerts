@@ -27,6 +27,22 @@ export const getPitchCountLevels = (pitchCount) => {
   }
 }
 
+export const getInningPitchCountLevels = (pitchesThisInning) => {
+  if (pitchesThisInning) {
+    if (pitchesThisInning < 14) {
+      return 'Low'
+    }
+    if (pitchesThisInning <= 20) {
+      return 'Watch'
+    }
+    else {
+      return 'High'
+    }
+  } else {
+    return 'Calculating...'
+  }
+}
+
 export const getWarningLevels = (level) => {
   if (level) {
     if (level === 'High') {

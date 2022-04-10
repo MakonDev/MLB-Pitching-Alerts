@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels } from "../Requests/GameData";
+import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels, getInningPitchCountLevels } from "../Requests/GameData";
 import { Grid, Card, CardContent, Collapse, CardActions } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -71,6 +71,9 @@ const SingleGame = (singleGame) => {
   const pitchCountLevel = getPitchCountLevels(pitches ? pitches[0] : null)
   const warningLevel = getWarningLevels(pitchCountLevel ? pitchCountLevel : null)
   const [inningPitches, setInningPitches] = useState(0)
+  const pitchesThisInning = (pitches && inningPitches) ? pitches[0]-inningPitches : 0
+  const inningPitchLevel = getInningPitchCountLevels(pitchesThisInning)
+  const inningWarningLevel = getWarningLevels(inningPitchLevel ? inningPitchLevel : null)
 
   useEffect(() => { //set initial inning pitches
       if (pitches && pitches.length !== 0) {
@@ -156,7 +159,7 @@ const SingleGame = (singleGame) => {
               {(pitches && pitches.length !== 0 && pitcherLineStats.length !== 0) &&
                 <>
                   <h2>Stats</h2>
-                  <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]} Pitches this Inning: {pitches[0]-inningPitches}</h3>
+                  <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]} Pitches this Inning: {pitchesThisInning}</h3>
                   <h3>Walks: {pitcherLineStats[0]} Ks: {pitcherLineStats[1]} Hits: {pitcherLineStats[2]}</h3>
                 </>
               }
@@ -171,6 +174,7 @@ const SingleGame = (singleGame) => {
           <>
             <h2>Alerts</h2>
             <h3 className={warningLevel}>Pitch Count: {pitchCountLevel}</h3>
+            <h3 className={inningWarningLevel}>Pitches this Inning: {inningPitchLevel}</h3>
           </>
           : <h3>No Alerts Available</h3>
         }
