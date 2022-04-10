@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { getLiveGameData, getPitchCountLevels, getWarningLevels } from "../Requests/GameData";
+import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels } from "../Requests/GameData";
 import { Grid, Card, CardContent, Collapse, CardActions } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -20,7 +20,6 @@ const ExpandMore = styled((props) => {
 
 const SingleGame = (singleGame) => {
   const game = singleGame.singleGame
-  //console.log(game.teams)
   const homeTeamName = (game && game.teams && game.teams.home) ? game.teams.home.team.name : 'Home'
   const awayTeamName = (game && game.teams && game.teams.away) ? game.teams.away.team.name : 'Away'
   const gameStatus = (game && game.status) ? game.status.detailedState : 'Pending'
@@ -35,10 +34,13 @@ const SingleGame = (singleGame) => {
     : true
   );
   const [gameInfoLive, setGameInfoLive] = useState({})
+  const [pitcherLineStats, setPitcherLineStats] = useState([])
+  const gameDate = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.datetime) ? gameInfoLive.gameData.datetime.officialDate : '2022-04-08'
   const currentBatter = (gameInfoLive && gameInfoLive.liveData && gameInfoLive.liveData.linescore && gameInfoLive.liveData.linescore.offense
     && gameInfoLive.liveData.linescore.offense.batter) ? gameInfoLive.liveData.linescore.offense.batter.fullName : ''
   const linescore = (gameInfoLive && gameInfoLive.liveData) ? gameInfoLive.liveData.linescore : {}
   const currentPitcher = (linescore && linescore.defense && linescore.defense.pitcher) ? linescore.defense.pitcher.fullName : 'Not yet'
+  const currentPitcherId = (linescore && linescore.defense && linescore.defense.pitcher) ? linescore.defense.pitcher.id : null
   const probableHomePitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.home) ? gameInfoLive.gameData.probablePitchers.home.fullName : 'No Probable Home Pitcher'
   const probableAwayPitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.away) ? gameInfoLive.gameData.probablePitchers.away.fullName : 'No Probable Away Pitcher'
 
@@ -54,7 +56,6 @@ const SingleGame = (singleGame) => {
             if (pitchersSplits[i].includes(lastName)) {
               let split = pitchersSplits[i].replace(".","")
               const values = split.split(" ")
-              
               pitches = values.at(-1).split("-")
               break;
             }
@@ -79,8 +80,8 @@ const SingleGame = (singleGame) => {
       const fetchGameInfo = async () => {
         const LIVE_GAME_URL = getLiveGameData(game.gamePk)
         const gameData = await axios.get(LIVE_GAME_URL);
+        //console.log(gameData.data)
         setGameInfoLive(gameData.data)
-        
       }
 
       fetchGameInfo().catch(() => {
@@ -88,6 +89,27 @@ const SingleGame = (singleGame) => {
       })
     }
   },[game, game.gamePk])
+
+  useEffect(() => {
+    if (game && game.gamePk && currentPitcherId) {
+      const fetchPlayerStats = async () => {
+        const STATS_URL = getSpecificPlayerGameStats(currentPitcherId)
+        const playerStats = await axios.get(STATS_URL)
+        const person = playerStats.data.people[0]
+        if (person.stats) {
+          const currentGame = person.stats[0].splits.at(-1)
+          if (currentGame.date === gameDate) {
+            const data = [currentGame.stat.baseOnBalls, currentGame.stat.strikeOuts, currentGame.stat.hits]
+            setPitcherLineStats(data)
+          }
+        }
+      }
+
+      fetchPlayerStats().catch((e) => {
+        console.log("Error fetching live game data", e)
+      })
+    }
+  },[game, game.pk, currentPitcherId, gameDate])
 
   return (
     <Grid item xs={6} >
@@ -123,8 +145,12 @@ const SingleGame = (singleGame) => {
           ? 
             <>
               <h2>Current Pitcher: {currentPitcher}</h2>
-              {(pitches && pitches.length !== 0) &&
-                <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]}</h3>
+              {(pitches && pitches.length !== 0 && pitcherLineStats.length !== 0) &&
+                <>
+                  <h2>Stats</h2>
+                  <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]}</h3>
+                  <h3>Walks: {pitcherLineStats[0]} Ks: {pitcherLineStats[1]} Hits: {pitcherLineStats[2]}</h3>
+                </>
               }
 
             </>

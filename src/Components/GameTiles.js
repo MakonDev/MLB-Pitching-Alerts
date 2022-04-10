@@ -14,7 +14,6 @@ const GameTiles = () => {
       const fetchGamesInfo = async () => {
         const gameData = await axios.get(GAME_DATA_URL);
         const gameDataLoad = gameData.data.dates.at(-1)
-        console.log(gameDataLoad)
         setGames(gameDataLoad)
       }
 

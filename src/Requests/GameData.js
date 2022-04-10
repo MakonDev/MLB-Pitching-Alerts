@@ -1,12 +1,15 @@
-import axios from "axios";
-
 export const GAME_DATA_URL = "https://statsapi.mlb.com/api/v1/schedule?sportId=1"
 
 export const getLiveGameData = (gamePk) => {
-  return 'https://statsapi.mlb.com/api/v1.1/game/' + gamePk + '/feed/live'
+  if (gamePk) {
+    return 'https://statsapi.mlb.com/api/v1.1/game/' + gamePk + '/feed/live'
+  }
+  return ''
 }
 
-export const MLB_AVERAGE = 78
+export const getSpecificPlayerGameStats = (playerId) => {
+  return "https://statsapi.mlb.com/api/v1/people?personIds="+playerId+"&season=2022&hydrate=stats(type=gameLog,season=2022,gameType=R)"
+}
 
 export const getPitchCountLevels = (pitchCount) => {
   if (pitchCount) {
