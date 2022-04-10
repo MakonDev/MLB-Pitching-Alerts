@@ -1,11 +1,15 @@
 const express = require("express");
+const { gameSchedule } = require("./apiFunctions");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'build')));
+//app.use(express.static(path.join(__dirname, 'build')));
 
 app.get("/api", (req, res) => {
-  res.json({ message: "Hello from Express!" });
+  const one  = gameSchedule();
+  console.log(one)
+
+  res.json({ message: "Hello from Express!", data: one });
 });
 
 app.listen(PORT, () => {

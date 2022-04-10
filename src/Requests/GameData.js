@@ -27,15 +27,14 @@ export const getPitchCountLevels = (pitchCount) => {
   }
 }
 
-export const getTimeStamp = (datetime) => {
-  if (datetime) {
-    const splits = datetime.split("T")
-    const timeSplit = splits[1].split(".")
-    return timeSplit[0]
-  }
-  return 'TBD'
-  
-}
+// export const getTimeStamp = (datetime) => {
+//   if (datetime) {
+//     const splits = datetime.split("T")
+//     const timeSplit = splits[1].split(".")
+//     return timeSplit[0]
+//   }
+//   return 'TBD'
+// }
 
 export const getInningPitchCountLevels = (pitchesThisInning) => {
   if (pitchesThisInning) {
