@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels, getInningPitchCountLevels } from "../Requests/GameData";
+import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels, getInningPitchCountLevels, getTimeStamp } from "../Requests/GameData";
 import { Grid, Card, CardContent, Collapse, CardActions } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -35,6 +35,7 @@ const SingleGame = (singleGame) => {
   );
   const [gameInfoLive, setGameInfoLive] = useState({})
   const [pitcherLineStats, setPitcherLineStats] = useState([])
+  const firstPitch = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.gameInfo) ? getTimeStamp(gameInfoLive.gameData.gameInfo.firstPitch) : 'TBD'
   const gameDate = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.datetime) ? gameInfoLive.gameData.datetime.officialDate : '2022-04-08'
   const currentBatter = (gameInfoLive && gameInfoLive.liveData && gameInfoLive.liveData.linescore && gameInfoLive.liveData.linescore.offense
     && gameInfoLive.liveData.linescore.offense.batter) ? gameInfoLive.liveData.linescore.offense.batter.fullName : ''
@@ -126,7 +127,7 @@ const SingleGame = (singleGame) => {
     <Grid item xs={6} >
       <Card variant="outlined">
       <CardContent className={"gameNotBeingPlayed"}>
-        {(homeScore && awayScore) ?
+        {(homeScore!==-1 && awayScore!==-1) ?
         <h2>
           {homeTeamName}: {homeScore} {homeWin && <span>(W)</span>} vs. {awayTeamName}: {awayScore} {awayWin && <span>(W)</span>}
         </h2> :
@@ -136,7 +137,7 @@ const SingleGame = (singleGame) => {
         }
         {gameLive 
           ? <h3>Situation: {linescore.inningHalf} {linescore.currentInning}, {linescore.balls}-{linescore.strikes} Count {linescore.outs} Outs, {currentBatter} hitting.</h3> 
-          : <h3>Status: {gameStatus}</h3>
+          : <h3>Status: {gameStatus} First Pitch: {firstPitch}</h3>
         }
       </CardContent>
       <CardActions>
