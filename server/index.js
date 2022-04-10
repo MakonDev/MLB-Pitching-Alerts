@@ -2,6 +2,8 @@ const express = require("express");
 const PORT = process.env.PORT || 3001;
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'build')));
+
 app.get("/api", (req, res) => {
   res.json({ message: "Hello from Express!" });
 });
