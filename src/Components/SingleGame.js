@@ -70,6 +70,14 @@ const SingleGame = (singleGame) => {
   const pitches = getTotalPitches(currentPitcher ? currentPitcher : null)
   const pitchCountLevel = getPitchCountLevels(pitches ? pitches[0] : null)
   const warningLevel = getWarningLevels(pitchCountLevel ? pitchCountLevel : null)
+  const [inningPitches, setInningPitches] = useState(0)
+
+  useEffect(() => { //set initial inning pitches
+      if (pitches && pitches.length !== 0) {
+        setInningPitches(pitches[0])
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[currentPitcher])
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -148,7 +156,7 @@ const SingleGame = (singleGame) => {
               {(pitches && pitches.length !== 0 && pitcherLineStats.length !== 0) &&
                 <>
                   <h2>Stats</h2>
-                  <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]}</h3>
+                  <h3>Total Pitches: {pitches[0]} Strikes: {pitches[1]} Pitches this Inning: {pitches[0]-inningPitches}</h3>
                   <h3>Walks: {pitcherLineStats[0]} Ks: {pitcherLineStats[1]} Hits: {pitcherLineStats[2]}</h3>
                 </>
               }
