@@ -31,15 +31,6 @@ export const getPitchCountLevels = (pitchCount) => {
   }
 }
 
-// export const getTimeStamp = (datetime) => {
-//   if (datetime) {
-//     const splits = datetime.split("T")
-//     const timeSplit = splits[1].split(".")
-//     return timeSplit[0]
-//   }
-//   return 'TBD'
-// }
-
 export const getInningPitchCountLevels = (pitchesThisInning) => {
   if (pitchesThisInning) {
     if (pitchesThisInning < 14) {
@@ -61,7 +52,7 @@ export const getTwitterLevels = (twitterPitcherInfo) => {
     if (twitterPitcherInfo.recentHourTweets <= twitterPitcherInfo.averageTweets) {
       return 'Low'
     }
-    if (twitterPitcherInfo.recentHourTweets < twitterPitcherInfo.averageTweets*2) {
+    if (twitterPitcherInfo.recentHourTweets < twitterPitcherInfo.averageTweets*3) {
       return 'Watch'
     }
     else {

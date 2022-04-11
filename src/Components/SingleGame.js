@@ -45,7 +45,6 @@ const SingleGame = (singleGame) => {
   const probableAwayPitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.away) ? gameInfoLive.gameData.probablePitchers.away.fullName : 'No Probable Away Pitcher'
   const currentPitcherTeam = (linescore && linescore.defense && linescore.defense.team) ? linescore.defense.team.name : 'No team'
 
-  console.log(linescore ? linescore : "NAH")
   const getTotalPitches = (pitcher) => {
     if (gameInfoLive && gameInfoLive.liveData && pitcher) {
       let pitches =[]
@@ -136,13 +135,14 @@ const SingleGame = (singleGame) => {
           const response = await axios.get(
             "https://mlbp-itching-twitter-engine.vercel.app/api/twitterCounts?date="+gameDate+"&name="+pitcherLastName[1]+"&team="+currentPitcherTeam
           )
+          console.log(response.data.data)
           setTwitterPlayerInfo(response.data.data)
         }
         backend().catch(() => {
           console.log("backend error")
         })
       }
-    },15000);
+    },30000);
     return () => clearInterval(intervalId);
   })
 
