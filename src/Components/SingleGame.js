@@ -43,7 +43,9 @@ const SingleGame = (singleGame) => {
   const currentPitcherId = (linescore && linescore.defense && linescore.defense.pitcher) ? linescore.defense.pitcher.id : null
   const probableHomePitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.home) ? gameInfoLive.gameData.probablePitchers.home.fullName : 'No Probable Home Pitcher'
   const probableAwayPitcher = (gameInfoLive && gameInfoLive.gameData && gameInfoLive.gameData.probablePitchers && gameInfoLive.gameData.probablePitchers.away) ? gameInfoLive.gameData.probablePitchers.away.fullName : 'No Probable Away Pitcher'
+  const currentPitcherTeam = (linescore && linescore.defense && linescore.defense.team) ? linescore.defense.team.name : 'No team'
 
+  console.log(linescore ? linescore : "NAH")
   const getTotalPitches = (pitcher) => {
     if (gameInfoLive && gameInfoLive.liveData && pitcher) {
       let pitches =[]
@@ -128,11 +130,11 @@ const SingleGame = (singleGame) => {
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      if (currentPitcher && gameDate && currentPitcher !== 'Not Yet' && gameDate !== '2022-04-08' && gameStatus && gameStatus === 'In Progress') {
+      if (currentPitcher && gameDate && currentPitcher !== 'Not Yet' && gameDate !== '2022-04-08' && gameStatus && gameStatus === 'In Progress' && currentPitcherTeam && currentPitcherTeam !== 'No team') {
         const backend = async () => {
           const pitcherLastName = currentPitcher.split(" ")
           const response = await axios.get(
-            "https://mlbp-itching-twitter-engine.vercel.app/api/twitterCounts?date="+gameDate+"&name="+pitcherLastName[1]
+            "https://mlbp-itching-twitter-engine.vercel.app/api/twitterCounts?date="+gameDate+"&name="+pitcherLastName[1]+"&team="+currentPitcherTeam
           )
           setTwitterPlayerInfo(response.data.data)
         }
