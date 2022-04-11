@@ -30,17 +30,6 @@ const GameTiles = () => {
     }
   },[games])
 
-  useEffect(() => {
-    const backend = async () => {
-      const response = await axios.get("https://mlbp-itching-twitter-engine.vercel.app/api")
-      console.log(response)
-    }
-    backend().catch(() => {
-      console.log("backend error")
-    })
-  })
-
-
   return (
     <Grid container spacing={2} className={"container"}>
       <Grid item xs={12}>

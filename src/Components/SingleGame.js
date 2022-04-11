@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels, getInningPitchCountLevels } from "../Requests/GameData";
+import { getLiveGameData, getPitchCountLevels, getSpecificPlayerGameStats, getWarningLevels, getInningPitchCountLevels, getTwitterLevels } from "../Requests/GameData";
 import { Grid, Card, CardContent, Collapse, CardActions } from '@mui/material'
 import { styled } from '@mui/material/styles';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -74,6 +74,9 @@ const SingleGame = (singleGame) => {
   const pitchesThisInning = (pitches && inningPitches) ? pitches[0]-inningPitches : 0
   const inningPitchLevel = getInningPitchCountLevels(pitchesThisInning)
   const inningWarningLevel = getWarningLevels(inningPitchLevel ? inningPitchLevel : null)
+  const [twitterPitcherInfo, setTwitterPlayerInfo] = useState({})
+  const tweetCountLevel = getTwitterLevels(twitterPitcherInfo)
+  const tweetWarningLevel = getWarningLevels(tweetCountLevel ? tweetCountLevel : null)
 
   useEffect(() => { //set initial inning pitches
       if (pitches && pitches.length !== 0) {
@@ -122,6 +125,25 @@ const SingleGame = (singleGame) => {
     }
   },[game, game.pk, currentPitcherId, gameDate])
 
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (currentPitcher && gameDate && currentPitcher !== 'Not Yet' && gameDate !== '2022-04-08' && gameStatus && gameStatus === 'In Progress') {
+        const backend = async () => {
+          const pitcherLastName = currentPitcher.split(" ")
+          const response = await axios.get(
+            "https://mlbp-itching-twitter-engine.vercel.app/api/twitterCounts?date="+gameDate+"&name="+pitcherLastName[1]
+          )
+          setTwitterPlayerInfo(response.data.data)
+        }
+        backend().catch(() => {
+          console.log("backend error")
+        })
+      }
+    },5000);
+    return () => clearInterval(intervalId);
+  })
+
   return (
     <Grid item xs={6} >
       <Card variant="outlined">
@@ -163,6 +185,11 @@ const SingleGame = (singleGame) => {
                   <h3>Walks: {pitcherLineStats[0]} Ks: {pitcherLineStats[1]} Hits: {pitcherLineStats[2]}</h3>
                 </>
               }
+              {
+                twitterPitcherInfo &&
+                <h3>Potential Bullpen Tweets: {twitterPitcherInfo.recentHourTweets} vs {twitterPitcherInfo.averageTweets ? twitterPitcherInfo.averageTweets.toFixed(2) : twitterPitcherInfo.averageTweets} tweets/hr</h3>
+            
+              }
 
             </>
           : <h2>Matchup: {probableHomePitcher} vs {probableAwayPitcher}</h2>
@@ -175,6 +202,9 @@ const SingleGame = (singleGame) => {
             <h2>Alerts</h2>
             <h3 className={warningLevel}>Pitch Count: {pitchCountLevel}</h3>
             <h3 className={inningWarningLevel}>Pitches this Inning: {inningPitchLevel}</h3>
+            {twitterPitcherInfo && 
+              <h3 className={tweetWarningLevel}>Flagged Tweets: {tweetCountLevel}</h3>
+            }
           </>
           : <h3>No Alerts Available</h3>
         }

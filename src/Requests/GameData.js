@@ -52,6 +52,22 @@ export const getInningPitchCountLevels = (pitchesThisInning) => {
   }
 }
 
+export const getTwitterLevels = (twitterPitcherInfo) => {
+  if (twitterPitcherInfo && twitterPitcherInfo.averageTweets && twitterPitcherInfo.recentHourTweets) {
+    if (twitterPitcherInfo.recentHourTweets <= twitterPitcherInfo.averageTweets) {
+      return 'Low'
+    }
+    if (twitterPitcherInfo.recentHourTweets < twitterPitcherInfo.averageTweets*2) {
+      return 'Watch'
+    }
+    else {
+      return 'High'
+    }
+  } else {
+    return 'Calculating ...'
+  }
+}
+
 export const getWarningLevels = (level) => {
   if (level) {
     if (level === 'High') {
