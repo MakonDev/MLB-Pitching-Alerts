@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { GAME_DATA_URL } from '../Requests/GameData';
+import { buildTodaysGamesUrl } from '../Requests/GameData';
 import SingleGame from "./SingleGame";
 import { Grid, Card } from '@mui/material'
 import './ComponentStyles.css'
@@ -12,7 +12,13 @@ const GameTiles = () => {
   useEffect(() => {
     const intervalId = setInterval(() => {
       const fetchGamesInfo = async () => {
-        const gameData = await axios.get(GAME_DATA_URL);
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+
+        today = yyyy + '-' + mm + '-' + dd;
+        const gameData = await axios.get(buildTodaysGamesUrl(today));
         const gameDataLoad = gameData.data.dates.at(-1)
         setGames(gameDataLoad)
       }

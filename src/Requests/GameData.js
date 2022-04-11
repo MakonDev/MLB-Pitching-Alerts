@@ -1,5 +1,9 @@
 export const GAME_DATA_URL = "https://statsapi.mlb.com/api/v1/schedule?sportId=1"
 
+export const buildTodaysGamesUrl = (date) => {
+  return "https://statsapi.mlb.com/api/v1/schedule?sportId=1&startDate="+date+"&endDate="+date
+}
+
 export const getLiveGameData = (gamePk) => {
   if (gamePk) {
     return 'https://statsapi.mlb.com/api/v1.1/game/' + gamePk + '/feed/live'
