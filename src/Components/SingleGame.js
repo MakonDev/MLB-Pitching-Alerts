@@ -142,7 +142,7 @@ const SingleGame = (singleGame) => {
           console.log("backend error")
         })
       }
-    },30000);
+    },10000);
     return () => clearInterval(intervalId);
   })
 
